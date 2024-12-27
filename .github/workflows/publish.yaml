@@ -69,9 +69,13 @@ jobs:
           }]' > metadata.json
 
           # Create temporary Dockerfile
-          echo "FROM busybox" > Dockerfile
-          echo "COPY metadata.json /data/output" >> Dockerfile
-          echo "CMD true" >> Dockerfile
+          cat <<EOF > Dockerfile
+          FROM busybox
+          COPY metadata.json /channel.json
+          USER 10010:10010
+          ENTRYPOINT ["cp"]
+          CMD ["/channel.json", "/data/output"]
+          EOF
 
       - name: Build and push metadata image
         uses: docker/build-push-action@v5
