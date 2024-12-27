@@ -69,7 +69,7 @@ jobs:
           }]' > metadata.json
 
           # Create temporary Dockerfile
-          echo "FROM scratch" > Dockerfile
+          echo "FROM busybox" > Dockerfile
           echo "COPY metadata.json /data/output" >> Dockerfile
           echo "CMD true" >> Dockerfile
 
