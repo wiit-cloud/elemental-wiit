@@ -71,6 +71,7 @@ jobs:
           # Create temporary Dockerfile
           echo "FROM scratch" > Dockerfile
           echo "COPY metadata.json /data/output" >> Dockerfile
+          echo "CMD true" >> Dockerfile
 
       - name: Build and push metadata image
         uses: docker/build-push-action@v5
