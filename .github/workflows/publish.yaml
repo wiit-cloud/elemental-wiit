@@ -25,25 +25,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=sha,format=short
-            type=raw,value=latest
-            type=semver,pattern={{version}},event=tag
+      - name: Build base os
+        run: make base-os
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Build bare-metal os
+        run: make bare-metal-os
+
+      - name: Build bare-metal iso
+        run: make bare-metal-iso
+
+      - name: Push
+        run: docker push --all-tags
 
       - name: Query available images
         id: query-images

@@ -1,12 +1,13 @@
-ARG OS_VERSION=noble-20241118.1
-ARG OS_REPO=github.com/max06/elemental-ubuntu
-ARG TOOLKIT_VERSION=v2.2.1
+ARG ELEMENTAL_TOOLKIT
+ARG UBUNTU_REPO
+ARG UBUNTU_VERSION
 
-FROM ghcr.io/rancher/elemental-toolkit/elemental-cli:${TOOLKIT_VERSION} AS toolkit
+FROM ${ELEMENTAL_TOOLKIT} AS toolkit
 
-FROM ubuntu:${OS_VERSION} AS os
+FROM ${UBUNTU_REPO}:${UBUNTU_VERSION} AS os
 
-ENV VERSION=${OS_VERSION}
+ENV VERSION=${UBUNTU_VERSION}
+ENV REPO=github.com/max06/elemental-ubuntu
 
 # install kernel, systemd, dracut, grub2 and other required tools
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -102,15 +103,3 @@ RUN mkdir -p /usr/lib/elemental/bootloader && \
 
 # Good for validation after the build
 CMD ["/bin/bash"]
-
-
-FROM os as builder
-
-COPY manifest.yaml manifest.yaml
-COPY --from=os / rootfs
-
-RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-ubuntu" dir:rootfs
-
-FROM busybox:stable
-
-COPY --from=builder /output /elemental-iso

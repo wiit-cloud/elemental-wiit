@@ -1,0 +1,14 @@
+ARG ELEMENTAL_BASE
+
+FROM ${ELEMENTAL_BASE} as os
+
+FROM ${ELEMENTAL_BASE} as builder
+
+COPY manifest.yaml manifest.yaml
+COPY --from=os / rootfs
+
+RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-ubuntu" dir:rootfs
+
+FROM busybox:stable
+
+COPY --from=builder /output /elemental-iso
