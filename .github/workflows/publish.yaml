@@ -34,6 +34,8 @@ jobs:
       - name: Build bare-metal iso
         run: make build-bare-metal-iso ELEMENTAL_BUILD=${{ github.GITHUB_RUN_NUMBER }}
 
+      - name: Debug step
+        run: echo $GITHUB_RUN_NUMBER
 
       - name: Query available images
         id: query-images
