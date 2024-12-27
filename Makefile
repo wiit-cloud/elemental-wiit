@@ -18,7 +18,7 @@ build-base-os:
 			--build-arg UBUNTU_REPO=$(UBUNTU_REPO) \
 			--build-arg UBUNTU_VERSION=$(UBUNTU_VERSION) \
 			-t $(ELEMENTAL_REPO)/base-os:$(ELEMENTAL_TAG) \
-			$(ifdef GITHUB_RUN_NUMBER,--push,) \
+			$(if [ -n "$(GITHUB_RUN_NUMBER)" ]; then echo "--push"; fi) \
 			-f Dockerfile.base.os .
 
 .PHONY: build-bare-metal-os
@@ -26,7 +26,7 @@ build-bare-metal-os:
 	$(DOCKER) build \
 			--build-arg ELEMENTAL_BASE=$(ELEMENTAL_REPO)/base-os:$(ELEMENTAL_TAG) \
 			-t $(ELEMENTAL_REPO)/bare-metal-os:$(ELEMENTAL_TAG) \
-			$(ifdef GITHUB_RUN_NUMBER,--push,) \
+			$(if [ -n "$(GITHUB_RUN_NUMBER)" ]; then echo "--push"; fi) \
 			-f Dockerfile.bare-metal.os .
 
 .PHONY: build-bare-metal-iso
@@ -34,5 +34,5 @@ build-bare-metal-iso:
 	$(DOCKER) build \
 			--build-arg ELEMENTAL_BASE=$(ELEMENTAL_REPO)/bare-metal-os:$(ELEMENTAL_TAG) \
 			-t $(ELEMENTAL_REPO)/bare-metal-iso:$(ELEMENTAL_TAG) \
-			$(ifdef GITHUB_RUN_NUMBER,--push,) \
+			$(if [ -n "$(GITHUB_RUN_NUMBER)" ]; then echo "--push"; fi) \
 			-f Dockerfile.bare-metal.iso .
