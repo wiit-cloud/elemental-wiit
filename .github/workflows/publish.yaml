@@ -60,10 +60,22 @@ jobs:
           },
           spec: {
               version: "v\(.tags[0])",
-              type: "iso",
+              type: "container",
               metadata: {
               upgradeImage: "ghcr.io/max06/elemental-ubuntu:\(.tags[0])",
               displayName: "Elemental Ubuntu - \(.tags[0])"
+              }
+          }
+          }, {
+          metadata: {
+              name: "elemental-ubuntu-\(.tags[0])"
+          },
+          spec: {
+              version: "v\(.tags[0])",
+              type: "iso",
+              metadata: {
+              uri: "ghcr.io/max06/elemental-ubuntu:\(.tags[0])",
+              displayName: "Elemental Ubuntu ISO - \(.tags[0])"
               }
           }
           }]' > metadata.json
