@@ -9,7 +9,7 @@ ELEMENTAL_TOOLKIT_VERSION?=v2.2.1
 # Outputs
 ELEMENTAL_REPO?=ghcr.io/max06/elemental-ubuntu
 ELEMENTAL_TAG?=$(UBUNTU_VERSION)-$(ELEMENTAL_TOOLKIT_VERSION)-dev
-
+ELEMENTAL_BUILD?=dev
 
 .PHONY: build-base-os
 build-base-os:
