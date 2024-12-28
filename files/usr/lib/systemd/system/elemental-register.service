@@ -1,0 +1,20 @@
+[Unit]
+Description=Elemental Register
+Documentation=https://elemental.docs.rancher.com
+Wants=network-online.target
+After=network-online.target
+# Backoff after 5 attempts in 5 min 
+StartLimitIntervalSec=5min
+StartLimitBurst=5
+# No need to manually reset failed state
+CollectMode=inactive-or-failed
+
+[Service]
+EnvironmentFile=-/etc/default/elemental
+EnvironmentFile=-/etc/sysconfig/proxy
+Type=oneshot
+# Use active state for Type=oneshot (used for Timer trigger)
+RemainAfterExit=true
+ExecStart=/usr/sbin/elemental-register --debug
+Restart=on-failure
+RestartSec=5
