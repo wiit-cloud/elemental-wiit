@@ -111,6 +111,9 @@ RUN mkdir -p /usr/lib/elemental/bootloader && \
     cp /usr/lib/shim/shimx64.efi.signed.latest /usr/lib/elemental/bootloader/shimx64.efi && \
     cp /usr/lib/shim/mmx64.efi /usr/lib/elemental/bootloader/mmx64.efi
 
+# Bootargs
+COPY bootargs.cfg /etc/elemental/bootargs.cfg
+
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
 
