@@ -9,6 +9,17 @@ FROM ${UBUNTU_REPO}:${UBUNTU_VERSION} AS os
 ENV VERSION=${UBUNTU_VERSION}
 ENV REPO=github.com/max06/elemental-ubuntu
 
+# Base tools
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    gpg \
+    gpgconf
+
+# Snapper repo
+RUN echo 'deb http://download.opensuse.org/repositories/filesystems:/snapper/xUbuntu_24.04/ /' > /etc/apt/sources.list.d/filesystems:snapper.list
+RUN curl -fsSL https://download.opensuse.org/repositories/filesystems:snapper/xUbuntu_24.04/Release.key | gpg --dearmor > /etc/apt/trusted.gpg.d/filesystems_snapper.gpg
+
 # install kernel, systemd, dracut, grub2 and other required tools
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     linux-generic \
@@ -42,8 +53,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     vim \
     less \
     sudo \
-    ca-certificates \
-    curl \
     iproute2 \
     dbus-daemon \
     patch \
