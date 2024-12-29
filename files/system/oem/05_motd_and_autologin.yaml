@@ -8,7 +8,7 @@ stages:
 
         Installation is in progress.
         You can "journalctl -f -u elemental-register-install" to view progress
-         
+
       permissions: 0644
     - path: /etc/systemd/system/serial-getty@ttyS0.service.d/override.conf
       content: |
@@ -22,3 +22,6 @@ stages:
         ExecStart=
         ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
       permissions: 0644
+    - users:
+      - name: root
+        passwd: root
