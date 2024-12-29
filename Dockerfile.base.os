@@ -95,8 +95,8 @@ RUN locale-gen --lang en_US.UTF-8
 # Add default snapshotter setup
 ADD snapshotter.yaml /etc/elemental/config.d/snapshotter.yaml
 
-# Generate initrd with required elemental services
-RUN elemental --debug init -f
+# # Generate initrd with required elemental services
+# RUN elemental --debug init -f
 
 # Update os-release file with some metadata
 RUN echo IMAGE_REPO=\"${ELEMENTAL_REPO}\"             >> /etc/os-release && \
@@ -117,7 +117,7 @@ RUN mkdir -p /usr/lib/elemental/bootloader && \
 
 
 # Rebuild initrd to setup dracut with the boot configurations
-# RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
+RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
 
 # Good for validation after the build
 CMD ["/bin/bash"]
