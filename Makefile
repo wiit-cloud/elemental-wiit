@@ -17,6 +17,8 @@ build-base-os:
 			--build-arg ELEMENTAL_TOOLKIT=$(ELEMENTAL_TOOLKIT_REPO):$(ELEMENTAL_TOOLKIT_VERSION) \
 			--build-arg UBUNTU_REPO=$(UBUNTU_REPO) \
 			--build-arg UBUNTU_VERSION=$(UBUNTU_VERSION) \
+			--build-arg ELEMENTAL_REPO=$(ELEMENTAL_REPO) \
+			--build-arg ELEMENTAL_TAG=$(ELEMENTAL_TAG) \
 			-t $(ELEMENTAL_REPO)/base-os:$(ELEMENTAL_TAG) \
 			$(if $(GITHUB_RUN_NUMBER),--push) \
 			-f Dockerfile.base.os .

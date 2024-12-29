@@ -7,7 +7,8 @@ FROM ${ELEMENTAL_TOOLKIT} AS toolkit
 FROM ${UBUNTU_REPO}:${UBUNTU_VERSION} AS os
 
 ENV VERSION=${UBUNTU_VERSION}
-ENV REPO=github.com/max06/elemental-ubuntu
+ARG ELEMENTAL_REPO
+ARG ELEMENTAL_TAG
 
 # Base tools
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -98,9 +99,9 @@ ADD snapshotter.yaml /etc/elemental/config.d/snapshotter.yaml
 RUN elemental --debug init -f
 
 # Update os-release file with some metadata
-RUN echo IMAGE_REPO=\"${REPO}\"             >> /etc/os-release && \
-    echo IMAGE_TAG=\"${VERSION}\"           >> /etc/os-release && \
-    echo IMAGE=\"${REPO}:${VERSION}\"       >> /etc/os-release && \
+RUN echo IMAGE_REPO=\"${ELEMENTAL_REPO}\"             >> /etc/os-release && \
+    echo IMAGE_TAG=\"${ELEMENTAL_TAG}\"           >> /etc/os-release && \
+    echo IMAGE=\"${ELEMENTAL_REPO}:${ELEMENTAL_TAG}\"       >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"Elemental\"      >> /etc/os-release
 
@@ -116,7 +117,7 @@ RUN mkdir -p /usr/lib/elemental/bootloader && \
 
 
 # Rebuild initrd to setup dracut with the boot configurations
-RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
+# RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
 
 # Good for validation after the build
 CMD ["/bin/bash"]
