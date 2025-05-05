@@ -1,22 +1,22 @@
 DOCKER?=docker
 
 # Inputs
-UBUNTU_REPO?=ubuntu
-UBUNTU_VERSION?=noble-20241118.1
+SOURCE_REPO?=registry.suse.com/suse/sl-micro/6.1/baremetal-os-container
+SOURCE_VERSION?=2.2.0-3.12
 ELEMENTAL_TOOLKIT_REPO?=ghcr.io/rancher/elemental-toolkit/elemental-cli
-ELEMENTAL_TOOLKIT_VERSION?=v2.2.1
+ELEMENTAL_TOOLKIT_VERSION?=v2.2.0
 
 # Outputs
 ELEMENTAL_BUILD?=dev
-ELEMENTAL_REPO?=ghcr.io/max06/elemental-ubuntu
-ELEMENTAL_TAG?=$(UBUNTU_VERSION)-$(ELEMENTAL_TOOLKIT_VERSION)-$(ELEMENTAL_BUILD)
+ELEMENTAL_REPO?=ghcr.io/max06/elemental-wiit
+ELEMENTAL_TAG?=$(SOURCE_VERSION)-$(ELEMENTAL_TOOLKIT_VERSION)-$(ELEMENTAL_BUILD)
 
 .PHONY: build-base-os
 build-base-os:
 	$(DOCKER) build \
 			--build-arg ELEMENTAL_TOOLKIT=$(ELEMENTAL_TOOLKIT_REPO):$(ELEMENTAL_TOOLKIT_VERSION) \
-			--build-arg UBUNTU_REPO=$(UBUNTU_REPO) \
-			--build-arg UBUNTU_VERSION=$(UBUNTU_VERSION) \
+			--build-arg SOURCE_REPO=$(SOURCE_REPO) \
+			--build-arg SOURCE_VERSION=$(SOURCE_VERSION) \
 			--build-arg ELEMENTAL_REPO=$(ELEMENTAL_REPO) \
 			--build-arg ELEMENTAL_TAG=$(ELEMENTAL_TAG) \
 			-t $(ELEMENTAL_REPO)/base-os:$(ELEMENTAL_TAG) \

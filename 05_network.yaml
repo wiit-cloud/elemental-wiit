@@ -29,4 +29,3 @@ stages:
          group: 0
        commands:
          - ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-         - netplan apply

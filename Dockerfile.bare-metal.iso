@@ -7,7 +7,7 @@ FROM ${ELEMENTAL_BASE} as builder
 COPY manifest.yaml manifest.yaml
 COPY --from=os / rootfs
 
-RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-ubuntu" dir:rootfs
+RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-wiit" dir:rootfs
 
 FROM busybox:stable
 

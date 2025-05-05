@@ -1,6 +1,0 @@
-name: "Elemental cloud-config from a removable device"
-stages:
-  initramfs:
-  - datasource:
-      providers: ["cdrom"]
-      path: "/oem"
