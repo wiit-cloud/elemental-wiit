@@ -19,7 +19,8 @@ RUN rpm --import https://download.opensuse.org/tumbleweed/repo/oss/gpg-pubkey-29
     tcpdump \
     wget \
     podman \
-    openvswitch
+    openvswitch \
+    networkmanager-ovs
 
 # Add a bunch of system files
 COPY files/ /
