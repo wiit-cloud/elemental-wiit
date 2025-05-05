@@ -11,7 +11,7 @@ ARG ELEMENTAL_REPO
 ARG ELEMENTAL_TAG
 
 # Custom commands
-RUN zypper addrepo https://download.opensuse.org/tumbleweed/repo/oss/ && \
+RUN zypper addrepo https://download.opensuse.org/tumbleweed/repo/oss/ oss && \
     zypper refresh && \
     zypper --non-interactive install --no-recommends -y \
     nmap \
