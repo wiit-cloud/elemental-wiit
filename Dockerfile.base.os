@@ -12,7 +12,8 @@ ARG ELEMENTAL_TAG
 
 # Custom commands
 RUN rpm --import https://download.opensuse.org/tumbleweed/repo/oss/gpg-pubkey-29b700a4-62b07e22.asc && \
-    zypper addrepo --refresh https://download.opensuse.org/tumbleweed/repo/oss/ oss && \
+    zypper addrepo https://download.opensuse.org/tumbleweed/repo/oss/ oss && \
+    zypper addrepo --refresh https://download.opensuse.org/tumbleweed/repo/non-oss/ non-oss && \
     zypper --non-interactive install --no-recommends -y \
     nmap \
     tcpdump \
