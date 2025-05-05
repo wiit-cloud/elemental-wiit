@@ -42,7 +42,7 @@ jobs:
         run: |
           # Query GHCR API for image tags
           TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/user/packages/container/elemental-ubuntu%2Fbare-metal-iso/versions")
+          "https://api.github.com/user/packages/container/elemental-wiit%2Fbare-metal-iso/versions")
 
           echo $TAGS | jq '[.[].metadata.container | {
           metadata: {
@@ -52,8 +52,8 @@ jobs:
               version: "v\(.tags[0])",
               type: "container",
               metadata: {
-                  upgradeImage: "ghcr.io/max06/elemental-ubuntu/bare-metal-os:\(.tags[0])",
-                  displayName: "Ubuntu 24.04 OS"
+                  upgradeImage: "ghcr.io/max06/elemental-wiit/bare-metal-os:\(.tags[0])",
+                  displayName: "Wiit elemental (.tags[0]) container"
               }
           }
           }, {
@@ -64,8 +64,8 @@ jobs:
               version: "v\(.tags[0])",
               type: "iso",
               metadata: {
-                  uri: "ghcr.io/max06/elemental-ubuntu/bare-metal-iso:\(.tags[0])",
-                  displayName: "Ubuntu 24.04 ISO"
+                  uri: "ghcr.io/max06/elemental-wiit/bare-metal-iso:\(.tags[0])",
+                  displayName: "Wiit elemental (.tags[0]) ISO"
               }
           }
           }]' > metadata.json
@@ -84,7 +84,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/max06/elemental-ubuntu-channel:bare-metal
+          tags: ghcr.io/max06/elemental-wiit-channel:bare-metal
           labels: |
-            org.opencontainers.image.description=Metadata image containing list of available elemental-ubuntu images
+            org.opencontainers.image.description=Metadata image containing list of available elemental-wiit images
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
