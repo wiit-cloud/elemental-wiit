@@ -21,6 +21,7 @@ RUN rpm --import https://download.opensuse.org/tumbleweed/repo/oss/gpg-pubkey-29
     wget \
     podman \
     openvswitch \
+    NetworkManager-branding-openSUSE \
     NetworkManager \
     NetworkManager-ovs
 
@@ -42,4 +43,4 @@ RUN \
 # IMPORTANT: it is good practice to recreate the initrd and re-apply `elemental-init`
 # command that was used in the base image. This ensures that any eventual change that should
 # be synced in initrd included binaries is also applied there and consistent.
-RUN elemental init --force elemental-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup
+RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
