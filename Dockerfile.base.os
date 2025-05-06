@@ -24,6 +24,8 @@ RUN rpm --import https://download.opensuse.org/tumbleweed/repo/oss/gpg-pubkey-29
     NetworkManager \
     NetworkManager-ovs
 
+RUN systemctl enable openvswitch.service
+
 # Add a bunch of system files
 COPY files/ /
 
