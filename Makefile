@@ -19,6 +19,8 @@ build-base-os:
 			--build-arg SOURCE_VERSION=$(SOURCE_VERSION) \
 			--build-arg ELEMENTAL_REPO=$(ELEMENTAL_REPO) \
 			--build-arg ELEMENTAL_TAG=$(ELEMENTAL_TAG) \
+			--build-arg IMAGE_REPO=$(ELEMENTAL_REPO)/base-os \
+			--build-arg IMAGE_TAG=$(ELEMENTAL_TAG) \
 			-t $(ELEMENTAL_REPO)/base-os:$(ELEMENTAL_TAG) \
 			$(if $(GITHUB_RUN_NUMBER),--push) \
 			-f Dockerfile.base.os .
