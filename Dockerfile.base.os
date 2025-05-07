@@ -1,44 +1,164 @@
-ARG ELEMENTAL_TOOLKIT
-ARG SOURCE_REPO
+# syntax=docker/dockerfile:1.15.1-labs
+
 ARG SOURCE_VERSION
 
-FROM ${ELEMENTAL_TOOLKIT} AS toolkit
+FROM golang:1.24.3-bookworm AS register
+WORKDIR /src/
+RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt update
+RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt install libssl-dev
 
-FROM ${SOURCE_REPO}:${SOURCE_VERSION} AS os
+ARG REGISTER_TAG
+ARG REGISTER_COMMIT
+ARG REGISTER_COMMITDATE
 
-ENV VERSION=${SOURCE_VERSION}
-ARG ELEMENTAL_REPO
-ARG ELEMENTAL_TAG
+ADD https://github.com/rancher/elemental-operator.git#${REGISTER_TAG} .
 
-# Custom commands
-RUN rpm --import https://download.opensuse.org/tumbleweed/repo/oss/gpg-pubkey-29b700a4-62b07e22.asc && \
-    zypper addrepo https://download.opensuse.org/tumbleweed/repo/oss/ oss && \
-    zypper addrepo --refresh https://download.opensuse.org/tumbleweed/repo/non-oss/ non-oss && \
-    zypper --non-interactive install --force-resolution -y NetworkManager-branding-openSUSE && \
-    zypper --non-interactive install --no-recommends -y \
+ENV CGO_ENABLED=1
+RUN go build  \
+    -ldflags "-w -s  \
+    -X github.com/rancher/elemental-operator/pkg/version.Version=${REGISTER_TAG}  \
+    -X github.com/rancher/elemental-operator/pkg/version.Commit=${REGISTER_COMMIT}  \
+    -X github.com/rancher/elemental-operator/pkg/version.CommitDate=${REGISTER_COMMITDATE}"  \
+    -o /usr/sbin/elemental-register ./cmd/register
+ENV CGO_ENABLED=0
+RUN go build  \
+    -ldflags "-w -s  \
+    -X github.com/rancher/elemental-operator/pkg/version.Version=${REGISTER_TAG}  \
+    -X github.com/rancher/elemental-operator/pkg/version.Commit=${REGISTER_COMMIT}  \
+    -X github.com/rancher/elemental-operator/pkg/version.CommitDate=${REGISTER_COMMITDATE}"  \
+    -o /usr/sbin/elemental-support ./cmd/support
+
+FROM golang:1.24.3-alpine AS toolkit
+WORKDIR /src/
+
+ARG TOOLKIT_TAG
+ARG TOOLKIT_COMMIT
+
+ADD https://github.com/rancher/elemental-toolkit.git#${TOOLKIT_TAG} .
+
+RUN go mod download
+RUN go generate ./...
+RUN go build \
+    -ldflags "LDFLAGS:=-w -s \
+    -X github.com/rancher/elemental-toolkit/v2/internal/version.version=${TOOLKIT_TAG} \
+    -X github.com/rancher/elemental-toolkit/v2/internal/version.gitCommit=${TOOLKIT_COMMIT}" \
+    -o /usr/bin/elemental
+
+FROM registry.opensuse.org/opensuse/tumbleweed:latest AS os
+ARG RANCHER_SYSTEM_AGENT_VERSION
+
+# install kernel, systemd, dracut, grub2 and other required tools
+RUN ARCH=$(uname -m); \
+    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+    zypper --non-interactive install --no-recommends -- \
+    kernel-default \
+    device-mapper \
+    dracut \
+    grub2 \
+    grub2-${ARCH}-efi \
+    shim \
+    haveged \
+    systemd \
+    NetworkManager \
+    openssh-server \
+    openssh-clients \
+    timezone \
+    parted \
+    e2fsprogs \
+    dosfstools \
+    mtools \
+    xorriso \
+    findutils \
+    gptfdisk \
+    rsync \
+    squashfs \
+    lvm2 \
+    tar \
+    gzip \
+    vim \
+    which \
+    less \
+    sudo \
+    curl \
+    iproute2 \
+    podman \
+    sed \
+    btrfsprogs \
+    btrfsmaintenance \
+    snapper \
+    glibc-gconv-modules-extra \
+    wget \
+    unzip \
     nmap \
     tcpdump \
-    wget \
-    podman \
     openvswitch \
     NetworkManager-ovs
 
-RUN systemctl enable openvswitch.service
+# elemental-register dependencies
+RUN ARCH=$(uname -m); \
+    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+    zypper --non-interactive install --no-recommends -- \
+    dmidecode
+# libopenssl-1_1
 
-# Add a bunch of system files
+# Install nm-configurator
+RUN curl -o /usr/sbin/nmc -L https://github.com/suse-edge/nm-configurator/releases/latest/download/nmc-linux-$(uname -m)
+RUN chmod +x /usr/sbin/nmc
+
+# SELinux policy and tools
+RUN ARCH=$(uname -m); \
+    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+    zypper --non-interactive install --no-recommends -- \
+    patterns-microos-selinux \
+    k3s-selinux \
+    audit
+
+# Add system files
 COPY files/ /
 
-# IMPORTANT: /etc/os-release is used for versioning/upgrade. The
-# values here should reflect the tag of the image currently being built
+# Enable SELinux (The security=selinux arg is default on Micro, not on Tumbleweed)
+RUN sed -i "s/selinux=1/security=selinux selinux=1/g" /etc/elemental/bootargs.cfg
+# Enforce SELinux
+# RUN sed -i "s/enforcing=0/enforcing=1/g" /etc/elemental/bootargs.cfg
+
+# Add elemental-register
+COPY --from=register /usr/sbin/elemental-register /usr/sbin/elemental-register
+COPY --from=register /usr/sbin/elemental-support /usr/sbin/elemental-support
+# Add the elemental cli
+COPY --from=toolkit /usr/bin/elemental /usr/bin/elemental
+
+# Add the elemental-system-agent
+ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RANCHER_SYSTEM_AGENT_VERSION}/rancher-system-agent-amd64 /usr/sbin/elemental-system-agent
+
+# Enable essential services
+RUN systemctl enable NetworkManager.service sshd elemental-register.timer openvswitch.service
+
+
+# This is for testing purposes, do not do this in production.
+RUN echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf
+
+# Make sure trusted certificates are properly generated
+RUN /usr/sbin/update-ca-certificates
+
+# Ensure /tmp is mounted as tmpfs by default
+RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
+    cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
+    fi
+
+# Save some space
+RUN zypper clean --all && \
+    rm -rf /var/log/update* && \
+    >/var/log/lastlog && \
+    rm -rf /boot/vmlinux*
+
+# Update os-release file with some metadata
 ARG IMAGE_REPO=norepo
 ARG IMAGE_TAG=latest
-RUN \
-    sed -i -e "s|^IMAGE_REPO=.*|IMAGE_REPO=\"${IMAGE_REPO}\"|g" /etc/os-release && \
-    sed -i -e "s|^IMAGE_TAG=.*|IMAGE_TAG=\"${IMAGE_TAG}\"|g" /etc/os-release && \
-    sed -i -e "s|^IMAGE=.*|IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"|g" /etc/os-release
+RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
+    echo GRUB_ENTRY_NAME=\"Elemental Wiit\" >> /etc/os-release && \
+    echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release && \
+    echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release && \
+    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release
 
-
-# IMPORTANT: it is good practice to recreate the initrd and re-apply `elemental-init`
-# command that was used in the base image. This ensures that any eventual change that should
-# be synced in initrd included binaries is also applied there and consistent.
+# Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
