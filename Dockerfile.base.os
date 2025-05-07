@@ -109,8 +109,8 @@ RUN chmod +x /usr/sbin/nmc
 RUN ARCH=$(uname -m); \
     [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-    patterns-microos-selinux \
-    k3s-selinux \
+    # patterns-base-selinux \
+    # rke2-selinux \
     audit
 
 # Add system files
