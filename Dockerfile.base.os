@@ -1,5 +1,31 @@
 # syntax=docker/dockerfile:1.15.1-labs
 
+FROM golang:1.24.3-bookworm as builder
+
+ARG TAG=v1.6.8
+ARG COMMIT="d8008d7"
+ARG COMMITDATE="2025-04-23"
+
+ADD https://github.com/rancher/elemental-operator@$TAG .
+
+ENV CGO_ENABLED=1
+RUN go build  \
+    -ldflags "-w -s  \
+    -X github.com/rancher/elemental-operator/pkg/version.Version=$TAG  \
+    -X github.com/rancher/elemental-operator/pkg/version.Commit=$COMMIT  \
+    -X github.com/rancher/elemental-operator/pkg/version.CommitDate=$COMMITDATE"  \
+    -o /usr/sbin/elemental-register ./cmd/register
+ENV CGO_ENABLED=0
+RUN go build  \
+    -ldflags "-w -s  \
+    -X github.com/rancher/elemental-operator/pkg/version.Version=$TAG  \
+    -X github.com/rancher/elemental-operator/pkg/version.Commit=$COMMIT  \
+    -X github.com/rancher/elemental-operator/pkg/version.CommitDate=$COMMITDATE"  \
+    -o /usr/sbin/elemental-support ./cmd/support
+
+
+ARG ELEMENTAL_TOOLKIT
+ARG SOURCE_REPO
 ARG SOURCE_VERSION
 
 FROM golang:1.24.3-bookworm AS register
@@ -158,7 +184,10 @@ RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"Elemental Wiit\" >> /etc/os-release && \
     echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release && \
-    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release
+    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
+    echo NAME=\"Elemental Wiit ${IMAGE_TAG}\" >> /etc/os-release && \
+    echo PRETTY_NAME=\"Elemental Wiit ${IMAGE_TAG}\" >> /etc/os-release
+
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
