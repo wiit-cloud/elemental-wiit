@@ -185,9 +185,8 @@ RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
     echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
-    echo NAME=\"Elemental Wiit ${IMAGE_TAG}\" >> /etc/os-release && \
-    echo PRETTY_NAME=\"Elemental Wiit ${IMAGE_TAG}\" >> /etc/os-release
-
+    sed -i -e "s|^NAME=.*|NAME=\"Elemental Wiit ${IMAGE_TAG}\"|g" /etc/os-release && \
+    sed -i -e "s|^PRETTY_NAME=.*|PRETTY_NAME=\"Elemental Wiit ${IMAGE_TAG}\"|g" /etc/os-release
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
