@@ -128,7 +128,8 @@ RUN ARCH=$(uname -m); \
     bind-utils \
     jq \
     yq \
-    bash-completion
+    bash-completion \
+    frr
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
