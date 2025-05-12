@@ -118,7 +118,17 @@ RUN ARCH=$(uname -m); \
     nmap \
     tcpdump \
     openvswitch \
-    NetworkManager-ovs
+    NetworkManager-ovs \
+    tmux \
+    screen \
+    traceroute \
+    iputils \
+    ipmitool \
+    netcat \
+    bind-utils \
+    jq \
+    yq \
+    bash-completion
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
