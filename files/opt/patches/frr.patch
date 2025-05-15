@@ -163,3 +163,4 @@ diff -upr ../frr-original/frr.conf ./frr.conf
 +!
 +end
 +log syslog informational
++
