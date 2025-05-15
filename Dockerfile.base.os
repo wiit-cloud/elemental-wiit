@@ -129,7 +129,9 @@ RUN ARCH=$(uname -m); \
     jq \
     yq \
     bash-completion \
-    frr
+    frr \
+    patch \
+    wireshark
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
@@ -187,6 +189,10 @@ RUN zypper clean --all && \
     rm -rf /var/log/update* && \
     >/var/log/lastlog && \
     rm -rf /boot/vmlinux*
+
+# Apply some image customizations, using patches
+RUN cd /etc/frr && patch -p0 < /opt/patches/frr.patch && cd
+
 
 # Update os-release file with some metadata
 ARG IMAGE_REPO=norepo
