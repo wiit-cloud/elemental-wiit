@@ -14,7 +14,7 @@ TOOLKIT_COMMIT=1fbc11e
 
 # Outputs
 ELEMENTAL_BUILD?=dev
-ELEMENTAL_REPO?=ghcr.io/max06/elemental-wiit
+ELEMENTAL_REPO?=ghcr.io/wiit-cloud/elemental-wiit
 ELEMENTAL_TAG?=$(SOURCE_VERSION)-$(ELEMENTAL_BUILD)
 
 .PHONY: build-base-os
@@ -51,7 +51,4 @@ build-bare-metal-iso:
 			$(if $(GITHUB_RUN_NUMBER),--push) \
 			-f Dockerfile.bare-metal.iso .
 
-.PHONY: debug
-debug:
-	echo "Hello there"
-	echo "The value is $(if $(GITHUB_RUN_NUMBER),there!)"
+

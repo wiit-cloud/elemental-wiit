@@ -34,9 +34,6 @@ jobs:
       - name: Build bare-metal iso
         run: make build-bare-metal-iso ELEMENTAL_BUILD=${{ github.run_number }}
 
-      - name: Debug step
-        run: echo $GITHUB_RUN_NUMBER
-
       - name: Query available images
         id: query-images
         run: |
@@ -52,8 +49,8 @@ jobs:
               version: "v\(.tags[0])",
               type: "container",
               metadata: {
-                  upgradeImage: "ghcr.io/max06/elemental-wiit/bare-metal-os:\(.tags[0])",
-                  displayName: "Wiit elemental (.tags[0]) container"
+                  upgradeImage: "ghcr.io/wiit-cloud/elemental-wiit/bare-metal-os:\(.tags[0])",
+                  displayName: "Wiit elemental container"
               }
           }
           }, {
@@ -64,8 +61,8 @@ jobs:
               version: "v\(.tags[0])",
               type: "iso",
               metadata: {
-                  uri: "ghcr.io/max06/elemental-wiit/bare-metal-iso:\(.tags[0])",
-                  displayName: "Wiit elemental (.tags[0]) ISO"
+                  uri: "ghcr.io/wiit-cloud/elemental-wiit/bare-metal-iso:\(.tags[0])",
+                  displayName: "Wiit elemental ISO"
               }
           }
           }]' > metadata.json
@@ -84,7 +81,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/max06/elemental-wiit-channel:bare-metal
+          tags: ghcr.io/wiit-cloud/elemental-wiit-channel:bare-metal
           labels: |
             org.opencontainers.image.description=Metadata image containing list of available elemental-wiit images
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
