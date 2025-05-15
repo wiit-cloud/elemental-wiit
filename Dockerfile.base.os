@@ -193,7 +193,6 @@ RUN zypper clean --all && \
 # Apply some image customizations, using patches
 RUN cd /etc/frr && patch -p0 < /opt/patches/frr.patch && cd
 
-
 # Update os-release file with some metadata
 ARG IMAGE_REPO=norepo
 ARG IMAGE_TAG=latest

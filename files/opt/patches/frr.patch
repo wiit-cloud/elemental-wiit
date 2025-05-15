@@ -67,7 +67,7 @@ diff -upr ../frr-original/daemons ./daemons
 diff -upr ../frr-original/frr.conf ./frr.conf
 --- ../frr-original/frr.conf    2025-05-15 11:27:28.413900004 +0000
 +++ ./frr.conf  2025-05-15 11:28:25.931253387 +0000
-@@ -1,6 +1,181 @@
+@@ -1,6 +1,89 @@
 -!hostname frr
 -
 -!password frr
