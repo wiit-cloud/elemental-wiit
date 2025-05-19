@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.15.1-labs
 
-FROM golang:1.24.3-bookworm as builder
+FROM golang:1.24.3-bookworm AS builder
 
 ARG TAG=v1.6.8
 ARG COMMIT="d8008d7"
@@ -132,7 +132,8 @@ RUN ARCH=$(uname -m); \
     frr \
     patch \
     wireshark \
-    lldpd
+    lldpd \
+    dhcp-client
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \

@@ -1,5 +1,5 @@
 iso:
   bootloader-in-rootfs: true
-  grub-entry-name: "Elemental Debian Install"
+  grub-entry-name: "Elemental Wiit Install"
 
 squash-no-compression: true
