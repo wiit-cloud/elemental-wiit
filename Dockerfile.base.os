@@ -31,7 +31,7 @@ ARG SOURCE_VERSION
 FROM golang:1.24.3-bookworm AS register
 WORKDIR /src/
 RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt update
-RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt install libssl-dev
+RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt install -y libssl-dev
 
 ARG REGISTER_TAG
 ARG REGISTER_COMMIT
