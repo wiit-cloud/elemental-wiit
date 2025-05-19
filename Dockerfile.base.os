@@ -131,7 +131,8 @@ RUN ARCH=$(uname -m); \
     bash-completion \
     frr \
     patch \
-    wireshark
+    wireshark \
+    lldpd
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
