@@ -67,7 +67,7 @@ nmcli connection modify "$FABRIC_CONNECTION" ipv4.addresses "$DHCP4_WIIT_VENDOR_
 # Check if the connection update was successful
 if [ $? -eq 0 ]; then
     echo "Successfully updated '$FABRIC_CONNECTION' connection"
-    
+
     # Check if the connection is currently active
     if nmcli -t -f NAME,STATE connection show --active | grep -q "^$FABRIC_CONNECTION:activated"; then
         echo "Reapplying connection to activate new settings"
@@ -83,5 +83,3 @@ sed -i -e "s|^FABRIC_IP=.*|FABRIC_IP=${DHCP4_WIIT_VENDOR_FABRIC_IP}|g" /etc/wiit
 for con in $(nmcli -g NAME,TYPE connection show --active | grep ":802-3-ethernet"); do
   nmcli -g IP4.GATEWAY device show $(echo $con | cut -d ":" -f 1)
 done | paste -sd "," - | sed -i -e "s|^GATEWAYS=.*|GATEWAYS=${-}|g" /etc/wiit-env.vars
-
-
