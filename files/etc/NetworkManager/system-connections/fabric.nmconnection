@@ -13,6 +13,5 @@ method=manual
 [ipv6]
 addr-gen-mode=default
 method=auto
-may-fail=yes
 
 [proxy]
