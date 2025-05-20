@@ -7,6 +7,8 @@
 # Make executable with: chmod +x /etc/NetworkManager/dispatcher.d/10-fabric-ip-handler.sh
 # Make sure owner is root: chown root:root /etc/NetworkManager/dispatcher.d/10-fabric-ip-handler.sh
 
+set -x
+
 INTERFACE="$1"
 ACTION="$2"
 FABRIC_CONNECTION="fabric"
@@ -17,7 +19,7 @@ echo "Called with interface=$INTERFACE, action=$ACTION"
 # Exit if the action was triggered by the fabric interface
 if [ "$INTERFACE" == "$FABRIC_CONNECTION" ]; then
     echo "Triggered by fabric interface, exiting"
-    exit 1
+    exit 0
 fi
 
 # Check if this is an "up" event
@@ -26,12 +28,12 @@ if [ "$ACTION" != "up" ]; then
     exit 0
 fi
 
-if [ -z "$$CONNECTION_ID" ]; then
+if [ -z "$CONNECTION_ID" ]; then
     echo "Could not find active connection for interface $INTERFACE"
-    exit 1
+    exit 0
 fi
 
-echo "Found active connection: $$CONNECTION_ID for interface $INTERFACE"
+echo "Found active connection: $CONNECTION_ID for interface $INTERFACE"
 
 if [ -z "$DHCP4_WIIT_VENDOR_FABRIC_IP" ]; then
     echo "wiit_vendor_fabric_ip not found in DHCP options"
@@ -51,13 +53,13 @@ if ! nmcli connection show "$FABRIC_CONNECTION" &>/dev/null; then
 fi
 
 # Check if the fabric ip is already set
-if nmcli -t -f ipv4.addresses connection show "$FABRIC_CONNECTION" | grep $DHCP4_WIIT_VENDOR_FABRIC_IP; then
+if nmcli -t -f ipv4.addresses connection show "$FABRIC_CONNECTION" | grep -q "$DHCP4_WIIT_VENDOR_FABRIC_IP"; then
     echo "Fabric IP is already set, exiting"
     exit 0
 fi
 
 # Update the fabric connection with the new IP address
-echo "Updating '$FABRIC_CONNECTION' connection with IP: $DHCP4_WIIT_VENDOR_FABRIC_IP"
+echo "Updating $FABRIC_CONNECTION connection with IP: $DHCP4_WIIT_VENDOR_FABRIC_IP"
 
 # Update the connection IP address
 nmcli connection modify "$FABRIC_CONNECTION" ipv4.addresses "$DHCP4_WIIT_VENDOR_FABRIC_IP/$DHCP4_WIIT_VENDOR_FABRIC_CIDR"
@@ -77,4 +79,9 @@ fi
 
 # Write fabric ip into env file
 sed -i -e "s|^FABRIC_IP=.*|FABRIC_IP=${DHCP4_WIIT_VENDOR_FABRIC_IP}|g" /etc/wiit-env.vars
-exit 0
+
+for con in $(nmcli -g NAME,TYPE connection show --active | grep ":802-3-ethernet"); do
+  nmcli -g IP4.GATEWAY device show $(echo $con | cut -d ":" -f 1)
+done | paste -sd "," - | sed -i -e "s|^GATEWAYS=.*|GATEWAYS=${-}|g" /etc/wiit-env.vars
+
+
