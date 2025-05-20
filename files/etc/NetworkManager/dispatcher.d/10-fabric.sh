@@ -9,25 +9,15 @@
 
 INTERFACE="$1"
 ACTION="$2"
-TARGET_INTERFACES=("eth2" "eth3")
 FABRIC_CONNECTION="fabric"
-CONNECTION_NAME=""
 
 # Log to syslog
 logger -t "fabric-ip-handler" "Called with interface=$INTERFACE, action=$ACTION"
 
-# Check if this is one of our target interfaces
-INTERFACE_MATCH=0
-for TARGET_INTERFACE in "${TARGET_INTERFACES[@]}"; do
-    if [ "$INTERFACE" == "$TARGET_INTERFACE" ]; then
-        INTERFACE_MATCH=1
-        break
-    fi
-done
-
-if [ $INTERFACE_MATCH -eq 0 ]; then
-    logger -t "fabric-ip-handler" "Not one of our target interfaces (${TARGET_INTERFACES[*]}), exiting"
-    exit 0
+# Exit if the action was triggered by the fabric interface
+if [ "$INTERFACE" == "$FABRIC_CONNECTION" ]; then
+    logger -t "fabric-ip-handler" "Triggered by fabric interface, exiting"
+    exit 1
 fi
 
 # Check if this is a dhcp4-change event
@@ -58,6 +48,12 @@ fi
 if ! nmcli connection show "$FABRIC_CONNECTION" &>/dev/null; then
     logger -t "fabric-ip-handler" "Connection '$FABRIC_CONNECTION' does not exist, cannot update"
     exit 1
+fi
+
+# Check if the fabric ip is already set
+if nmcli -t -f ipv4.addresses connection show "$FABRIC_CONNECTION" | grep $FABRIC_IP; then
+    logger -t "fabric-ip-handler" "Fabric IP is already set, exiting"
+    exit 0
 fi
 
 # Update the fabric connection with the new IP address

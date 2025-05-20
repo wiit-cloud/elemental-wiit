@@ -1,5 +1,5 @@
 [connection]
-id=dummy
+id=fabric
 uuid=db96d278-ed10-4469-aa61-687cdcb85d1e
 type=dummy
 interface-name=fabric
