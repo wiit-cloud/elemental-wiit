@@ -12,6 +12,7 @@ set -x
 INTERFACE="$1"
 ACTION="$2"
 FABRIC_CONNECTION="fabric"
+VARS_FILE=/etc/wiit-env.vars
 
 # Log to syslog
 echo "Called with interface=$INTERFACE, action=$ACTION"
@@ -75,10 +76,40 @@ else
 fi
 
 # NOTE Beware of race-conditions here!
-# Write fabric IP into env file
-sed -i -r -e "s|^FABRIC_IP=.*|FABRIC_IP=${DHCP4_WIIT_VENDOR_FABRIC_IP}|g" /etc/wiit-env.vars
+# We might need to add a lock on the vars file to prevent concurrent writes
 
-for CONNECTION in $(nmcli -g NAME,TYPE connection show --active | grep ":802-3-ethernet" | cut -d ":" -f 1); do
-  DEVICE=$(nmcli -g connection.interface-name con show "$CONNECTION")
-  nmcli -g IP4.GATEWAY device show "$DEVICE"
-done | paste -sd "," - | sed -i -e "s|^GATEWAYS=.*|GATEWAYS=${-}|g" /etc/wiit-env.vars
+# Update fabric IP
+VARS_FILE_CONTENT=$(sed -r -e "s|^FABRIC_IP=.*|FABRIC_IP=${DHCP4_WIIT_VENDOR_FABRIC_IP}|g" "$VARS_FILE")
+
+arr_join() {
+    local IFS="$1"
+    shift
+    echo "$*"
+}
+
+active_connections() {
+    nmcli -g NAME,TYPE connection show --active | \
+        grep ":802-3-ethernet" | cut -d ":" -f 1
+}
+
+default_gateways() {
+    local connection device
+    for connection in $(active_connections); do
+        device=$(nmcli -g connection.interface-name con show "$connection")
+        nmcli -g IP4.GATEWAY device show "$device"
+    done
+}
+
+mapfile -t DEFAULT_GATEWAYS  < <(default_gateways)
+echo "Default gateways: ${DEFAULT_GATEWAYS[*]}" >&2
+
+# shellcheck disable=SC2001
+sed -e "s|^GATEWAYS=.*|GATEWAYS=$(arr_join , "${DEFAULT_GATEWAYS[@]}")|g" <<< "$VARS_FILE_CONTENT"
+
+# Write vars file.
+echo "$VARS_FILE_CONTENT" > "$VARS_FILE"
+
+{
+  echo "Vars file ($VARS_FILE) after update:"
+  cat "$VARS_FILE"
+} >&2
