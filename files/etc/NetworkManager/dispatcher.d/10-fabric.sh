@@ -75,4 +75,6 @@ else
     echo "Failed to update '$FABRIC_CONNECTION' connection"
 fi
 
+# Write fabric ip into env file
+sed -i -e "s|^FABRIC_IP=.*|FABRIC_IP=${DHCP4_WIIT_VENDOR_FABRIC_IP}|g" /etc/wiit-env.vars
 exit 0
