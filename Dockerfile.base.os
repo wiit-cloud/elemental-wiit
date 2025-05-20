@@ -175,6 +175,7 @@ ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RAN
 RUN systemctl enable NetworkManager.service sshd elemental-register.timer openvswitch.service
 
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh
+RUN chmod 0600 /etc/NetworkManager/system-connections/fabric.nmconnection
 
 # This is for testing purposes, do not do this in production.
 RUN echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf
