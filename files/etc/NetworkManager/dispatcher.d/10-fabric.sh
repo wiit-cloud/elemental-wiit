@@ -94,10 +94,10 @@ active_connections() {
 
 default_gateways() {
     local connection device
-    for connection in $(active_connections); do
+    while read -r connection; do
         device=$(nmcli -g connection.interface-name con show "$connection")
         nmcli -g IP4.GATEWAY device show "$device"
-    done
+    done < <(active_connections)
 }
 
 mapfile -t DEFAULT_GATEWAYS  < <(default_gateways)

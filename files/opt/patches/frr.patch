@@ -67,7 +67,7 @@ diff -upr ../frr-original/daemons ./daemons
 diff -upr ../frr-original/frr.conf ./frr.conf
 --- ../frr-original/frr.conf    2025-05-15 11:27:28.413900004 +0000
 +++ ./frr.conf  2025-05-15 11:28:25.931253387 +0000
-@@ -1,6 +1,79 @@
+@@ -1,6 +1,78 @@
 -!hostname frr
 -
 -!password frr
@@ -82,23 +82,14 @@ diff -upr ../frr-original/frr.conf ./frr.conf
 +log file /var/log/frr/bgpd.log
 +log stdout
 +!
-+int fabric
-+  ip address $FABRIC_IP
-+!
 +interface eth2
-+ no ipv6 nd suppress-ra
-+ ipv6 nd ra-interval 10
-+ ipv6 nd ra-lifetime 30
 +exit
 +!
 +interface eth3
-+ no ipv6 nd suppress-ra
-+ ipv6 nd ra-interval 10
-+ ipv6 nd ra-lifetime 30
 +exit
 +!
-+router bgp 4200006645
-+ bgp router-id 164.0.66.45
++router bgp 65401
++ bgp router-id $FABRIC_IP
 + bgp bestpath as-path multipath-relax
 + neighbor fabric peer-group
 + neighbor fabric remote-as external
@@ -113,9 +104,17 @@ diff -upr ../frr-original/frr.conf ./frr.conf
 +  neighbor fabric soft-reconfiguration inbound
 +  neighbor fabric route-map FABRIC_IN in
 +  neighbor fabric route-map FABRIC_OUT out
-+  network $FABRIC_IP/32
 + exit-address-family
 + !
++ address-family ipv6 unicast
++  maximum-paths 2
++  neighbor fabric activate
++  neighbor fabric next-hop-self
++  neighbor fabric soft-reconfiguration inbound
++  neighbor fabric route-map FABRIC_IN in
++  neighbor fabric route-map FABRIC_OUT out
++ exit-address-family
++exit
 +!
 +route-map FABRIC_IN permit 05
 + match ip address prefix-list DEFAULT_V4
@@ -123,7 +122,6 @@ diff -upr ../frr-original/frr.conf ./frr.conf
 +!
 +route-map FABRIC_IN permit 10
 + match ipv6 address prefix-list DEFAULT_V6
-+ set src $FABRIC_IP
 +exit
 +!
 +route-map FABRIC_OUT deny 05
