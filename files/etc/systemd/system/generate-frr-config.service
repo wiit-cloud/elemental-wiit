@@ -1,0 +1,13 @@
+[Unit]
+Description=Update FRR Configuration
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/bash -c 'for f in /etc/frr.original/*; do envsubst < /etc/frr.original/$f > /etc/frr/$f; done'
+ExecStart=/usr/bin/systemctl reload frr
+EnvironmentFile=/etc/wiit-env.vars
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

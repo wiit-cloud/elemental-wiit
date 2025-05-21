@@ -172,7 +172,7 @@ COPY --from=toolkit /usr/bin/elemental /usr/bin/elemental
 ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RANCHER_SYSTEM_AGENT_VERSION}/rancher-system-agent-amd64 /usr/sbin/elemental-system-agent
 
 # Enable essential services
-RUN systemctl enable NetworkManager.service sshd elemental-register.timer openvswitch.service
+RUN systemctl enable NetworkManager.service sshd elemental-register.timer openvswitch.service generate-frr-config.service
 
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh
 RUN chmod 0600 /etc/NetworkManager/system-connections/fabric.nmconnection
@@ -193,9 +193,6 @@ RUN zypper clean --all && \
     rm -rf /var/log/update* && \
     >/var/log/lastlog && \
     rm -rf /boot/vmlinux*
-
-# Apply some image customizations, using patches
-RUN cd /etc/frr && patch -p0 < /opt/patches/frr.patch && cd
 
 # Update os-release file with some metadata
 ARG IMAGE_REPO=norepo

@@ -113,3 +113,5 @@ echo "$VARS_FILE_CONTENT" > "$VARS_FILE"
   echo "Vars file ($VARS_FILE) after update:"
   cat "$VARS_FILE"
 } >&2
+
+systemctl restart generate-frr-config.service
