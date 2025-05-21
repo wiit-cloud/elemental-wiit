@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/bash -c 'for f in /etc/frr.original/*; do envsubst < /etc/frr.original/$f > /etc/frr/$f; done'
+ExecStartPre=/bin/bash -c 'for f in /etc/frr.original/*; do envsubst < $f > /etc/frr/$(basename $f); done'
 ExecStart=/usr/bin/systemctl reload frr
 EnvironmentFile=/etc/wiit-env.vars
 RemainAfterExit=yes
