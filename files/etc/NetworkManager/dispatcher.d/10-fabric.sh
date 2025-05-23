@@ -14,20 +14,18 @@ ACTION="$2"
 FABRIC_CONNECTION="fabric"
 VARS_FILE=/etc/wiit-env.vars
 
-# Log to syslog
-echo "Called with interface=$INTERFACE, action=$ACTION"
-
 # Exit if the action was triggered by the fabric interface
 if [ "$INTERFACE" == "$FABRIC_CONNECTION" ]; then
-    echo "Triggered by fabric interface, exiting"
     exit 0
 fi
 
 # Check if this is an "up" event
-if [ "$ACTION" != "up" ]; then
-    echo "Not an up event, exiting"
+if [ "$ACTION" != "up" && "$ACTION" != "dhcp4-change"]; then
     exit 0
 fi
+
+# Log to syslog
+echo "Called with interface=$INTERFACE, action=$ACTION"
 
 if [ -z "$CONNECTION_ID" ]; then
     echo "Could not find active connection for interface $INTERFACE"
@@ -37,14 +35,14 @@ fi
 echo "Found active connection: $CONNECTION_ID for interface $INTERFACE"
 
 if [ -z "$DHCP4_WIIT_VENDOR_FABRIC_IP" ]; then
-    echo "wiit_vendor_fabric_ip not found in DHCP options" >&2
-    exit 1
+    echo "wiit_vendor_fabric_ip not found in DHCP options, might appear later." >&2
+    exit 0
 fi
 
 # Get the current connection settings for prefix length and gateway
 if [ -z "$DHCP4_WIIT_VENDOR_FABRIC_CIDR" ]; then
     echo "Fabric CIDR not set on switch, cannot update" >&2
-    exit 1
+    exit 0
 fi
 
 # Check if the "fabric" connection exists

@@ -13,14 +13,13 @@ INTERFACE="$1"
 ACTION="$2"
 HOSTS_FILE="/etc/hosts"
 
-# Log to stdout (captured by nm-dispatcher into syslog)
-echo "Called with interface=$INTERFACE, action=$ACTION"
-
 # Exit if the action is not a hostname change
 if [ "$ACTION" != "hostname" ]; then
-    echo "Not a hostname event, exiting"
     exit 0
 fi
+
+# Log to stdout (captured by nm-dispatcher into syslog)
+echo "Called with action=$ACTION"
 
 # Get the new hostname from the system
 NEW_HOSTNAME=$(hostname 2>/dev/null || echo "")
