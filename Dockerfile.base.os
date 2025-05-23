@@ -173,7 +173,14 @@ COPY --from=toolkit /usr/bin/elemental /usr/bin/elemental
 ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RANCHER_SYSTEM_AGENT_VERSION}/rancher-system-agent-amd64 /usr/sbin/elemental-system-agent
 
 # Enable essential services
-RUN systemctl enable NetworkManager.service sshd elemental-register.timer openvswitch.service frr.service generate-frr-config.service
+RUN systemctl enable \
+    NetworkManager.service \
+    sshd.service \
+    elemental-register.timer \
+    openvswitch.service \
+    frr.service \
+    generate-frr-config.service \
+    lldpd.service
 
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh
 RUN chmod 0600 /etc/NetworkManager/system-connections/fabric.nmconnection
