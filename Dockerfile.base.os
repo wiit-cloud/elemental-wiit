@@ -133,7 +133,8 @@ RUN ARCH=$(uname -m); \
     patch \
     wireshark \
     lldpd \
-    dhcp-client
+    dhcp-client \
+    ovmf
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
