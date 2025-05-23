@@ -183,6 +183,7 @@ RUN systemctl enable \
     lldpd.service
 
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh
+RUN chmod +x /etc/NetworkManager/dispatcher.d/10-hostname-handler.sh
 RUN chmod 0600 /etc/NetworkManager/system-connections/fabric.nmconnection
 
 # This is for testing purposes, do not do this in production.
