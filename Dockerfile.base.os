@@ -179,7 +179,6 @@ RUN systemctl enable \
     elemental-register.timer \
     openvswitch.service \
     frr.service \
-    generate-frr-config.service \
     lldpd.service
 
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh

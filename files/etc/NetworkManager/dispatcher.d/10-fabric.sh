@@ -20,7 +20,7 @@ if [ "$INTERFACE" == "$FABRIC_CONNECTION" ]; then
 fi
 
 # Check if this is an "up" event
-if [ "$ACTION" != "up" && "$ACTION" != "dhcp4-change"]; then
+if [ "$ACTION" != "up" ] && ["$ACTION" != "dhcp4-change"]; then
     exit 0
 fi
 
@@ -112,4 +112,4 @@ echo "$VARS_FILE_CONTENT" > "$VARS_FILE"
   cat "$VARS_FILE"
 } >&2
 
-systemctl restart generate-frr-config.service
+systemctl restart frr.service
