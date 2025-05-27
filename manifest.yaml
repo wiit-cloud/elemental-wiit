@@ -1,6 +1,6 @@
 iso:
   bootloader-in-rootfs: true
   grub-entry-name: "Elemental Wiit Install"
-  extra-cmdline: "security=selinux enforcing=0 console=tty1 console=ttyS0 net.ifnames=0"
+#  extra-cmdline: "security=selinux enforcing=0 console=tty1 console=ttyS0 net.ifnames=0"
 
 squash-no-compression: true

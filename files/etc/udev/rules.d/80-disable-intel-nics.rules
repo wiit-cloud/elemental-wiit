@@ -1,0 +1,6 @@
+# /etc/udev/rules.d/80-intel-disable.rules
+# Disable all Intel network interfaces
+
+# More comprehensive approach - disable and mark as unmanaged
+SUBSYSTEM=="net", ACTION=="add", ATTR{device/vendor}=="0x8086", RUN+="/bin/ip link set dev $name down", ENV{NM_UNMANAGED}="1"
+

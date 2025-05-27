@@ -1,0 +1,5 @@
+# /etc/udev/rules.d/70-mellanox-rename.rules
+# Rename Mellanox network interfaces to mlx0, mlx1, etc.
+
+# Match Mellanox devices by vendor ID (15b3) and rename sequentially
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="mlx5_core", ATTR{device/vendor}=="0x15b3", NAME="mlx%n"
