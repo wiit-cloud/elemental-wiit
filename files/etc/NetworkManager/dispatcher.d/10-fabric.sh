@@ -112,4 +112,6 @@ echo "$VARS_FILE_CONTENT" > "$VARS_FILE"
   cat "$VARS_FILE"
 } >&2
 
-systemctl restart frr.service
+if [ -n $DHCP4_WIIT_VENDOR_FABRIC_IP ]; then
+    systemctl restart frr.service
+fi
