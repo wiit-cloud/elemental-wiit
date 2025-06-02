@@ -50,5 +50,3 @@ build-bare-metal-iso:
 			-t $(ELEMENTAL_REPO)/bare-metal-iso:$(ELEMENTAL_TAG) \
 			$(if $(GITHUB_RUN_NUMBER),--push) \
 			-f Dockerfile.bare-metal.iso .
-
-
