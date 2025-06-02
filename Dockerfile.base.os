@@ -201,7 +201,7 @@ RUN systemctl enable \
     # Save some space
     zypper clean --all && \
     rm -rf /var/log/update* && \
-    printf > /var/log/lastlog && \
+    printf '' > /var/log/lastlog && \
     rm -rf /boot/vmlinux*
 
 # Update os-release metadata
