@@ -145,7 +145,7 @@ RUN ARCH=$(uname -m); \
 
 # Install nm-configurator
 RUN curl -o /usr/sbin/nmc -L https://github.com/suse-edge/nm-configurator/releases/latest/download/nmc-linux-$(uname -m)
-RUN chmod +x /usr/sbin/nmc /usr/local/bin/wait-for-internet.sh
+RUN chmod +x /usr/sbin/nmc
 
 # SELinux policy and tools
 RUN ARCH=$(uname -m); \
