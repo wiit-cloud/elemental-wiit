@@ -36,9 +36,9 @@ RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt update
 # hadolint ignore=DL3027,DL3059
 RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt install -y libssl-dev
 
-ARG REGISTER_TAG
-ARG REGISTER_COMMIT
-ARG REGISTER_COMMITDATE
+ARG REGISTER_TAG=v1.6.8
+ARG REGISTER_COMMIT=d8008d7
+ARG REGISTER_COMMITDATE=2025-04-23
 
 ADD https://github.com/rancher/elemental-operator.git#${REGISTER_TAG} .
 
@@ -60,8 +60,8 @@ RUN go build  \
 FROM golang:1.24.3-alpine AS toolkit
 WORKDIR /src/
 
-ARG TOOLKIT_TAG
-ARG TOOLKIT_COMMIT
+ARG TOOLKIT_TAG=v2.2.2
+ARG TOOLKIT_COMMIT=1fbc11e
 
 ADD https://github.com/rancher/elemental-toolkit.git#${TOOLKIT_TAG} .
 
