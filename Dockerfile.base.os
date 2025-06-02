@@ -77,7 +77,7 @@ RUN go build \
 
 # hadolint ignore=DL3007
 FROM registry.opensuse.org/opensuse/tumbleweed:latest AS os
-ARG RANCHER_SYSTEM_AGENT_VERSION
+ARG RANCHER_SYSTEM_AGENT_VERSION=v0.3.12
 
 # install kernel, systemd, dracut, grub2 and other required tools
 # hadolint ignore=DL3036,DL3037
