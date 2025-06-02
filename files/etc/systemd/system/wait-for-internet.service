@@ -1,0 +1,15 @@
+[Unit]
+Description=Wait for Internet Connectivity
+After=network.target NetworkManager.service
+Before=network-online.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/wait-for-internet.sh
+TimeoutStartSec=300
+Restart=no
+
+[Install]
+WantedBy=network-online.target

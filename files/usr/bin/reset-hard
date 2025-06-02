@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+ipmitool chassis bootdev remotecd options=efiboot
+ipmitool chassis power reset

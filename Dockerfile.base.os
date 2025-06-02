@@ -179,7 +179,8 @@ RUN systemctl enable \
     elemental-register.timer \
     openvswitch.service \
     frr.service \
-    lldpd.service
+    lldpd.service \
+    wait-for-internet.service
 
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh
 RUN chmod +x /etc/NetworkManager/dispatcher.d/10-hostname-handler.sh
