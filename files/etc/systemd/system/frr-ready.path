@@ -1,0 +1,9 @@
+[Unit]
+Description=Monitor for fabric ip readyness
+
+[Path]
+PathExists=/run/fabric_ip_ready
+Unit=frr.service
+
+[Install]
+WantedBy=network.target

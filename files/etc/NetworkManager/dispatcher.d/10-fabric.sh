@@ -113,5 +113,5 @@ echo "$VARS_FILE_CONTENT" > "$VARS_FILE"
 } >&2
 
 if [ -n $DHCP4_WIIT_VENDOR_FABRIC_IP ]; then
-    systemctl restart frr.service
+    touch /run/fabric_ip_ready
 fi

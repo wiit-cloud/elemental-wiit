@@ -184,12 +184,12 @@ ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RAN
 # Enable essential services
 RUN systemctl enable \
       elemental-register.timer \
-      frr.service \
       lldpd.service \
       NetworkManager.service \
       openvswitch.service \
       sshd.service \
-      wait-for-internet.service && \
+      wait-for-internet.service \
+      frr-ready.path && \
     # This is for testing purposes, do not do this in production.
     echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf && \
     # Make sure trusted certificates are properly generated
