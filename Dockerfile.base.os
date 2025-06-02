@@ -30,12 +30,15 @@ ARG SOURCE_VERSION
 
 FROM golang:1.24.3-bookworm AS register
 WORKDIR /src/
+
+# hadolint ignore=DL3027
 RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt update
+# hadolint ignore=DL3027,DL3059
 RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt install -y libssl-dev
 
-ARG REGISTER_TAG
-ARG REGISTER_COMMIT
-ARG REGISTER_COMMITDATE
+ARG REGISTER_TAG=v1.6.8
+ARG REGISTER_COMMIT=d8008d7
+ARG REGISTER_COMMITDATE=2025-04-23
 
 ADD https://github.com/rancher/elemental-operator.git#${REGISTER_TAG} .
 
@@ -57,111 +60,117 @@ RUN go build  \
 FROM golang:1.24.3-alpine AS toolkit
 WORKDIR /src/
 
-ARG TOOLKIT_TAG
-ARG TOOLKIT_COMMIT
+ARG TOOLKIT_TAG=v2.2.2
+ARG TOOLKIT_COMMIT=1fbc11e
 
 ADD https://github.com/rancher/elemental-toolkit.git#${TOOLKIT_TAG} .
 
 RUN go mod download
+# hadolint ignore=DL3059
 RUN go generate ./...
+# hadolint ignore=DL3059
 RUN go build \
     -ldflags "LDFLAGS:=-w -s \
     -X github.com/rancher/elemental-toolkit/v2/internal/version.version=${TOOLKIT_TAG} \
     -X github.com/rancher/elemental-toolkit/v2/internal/version.gitCommit=${TOOLKIT_COMMIT}" \
     -o /usr/bin/elemental
 
+# hadolint ignore=DL3007
 FROM registry.opensuse.org/opensuse/tumbleweed:latest AS os
-ARG RANCHER_SYSTEM_AGENT_VERSION
+ARG RANCHER_SYSTEM_AGENT_VERSION=v0.3.12
 
 # install kernel, systemd, dracut, grub2 and other required tools
-RUN ARCH=$(uname -m); \
-    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+# hadolint ignore=DL3036,DL3037
+RUN ARCH="$(uname -m)"; \
+    [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-    kernel-default \
-    device-mapper \
-    dracut \
-    grub2 \
-    grub2-${ARCH}-efi \
-    shim \
-    haveged \
-    systemd \
-    NetworkManager \
-    openssh-server \
-    openssh-clients \
-    timezone \
-    parted \
-    e2fsprogs \
-    dosfstools \
-    mtools \
-    xorriso \
-    findutils \
-    gptfdisk \
-    rsync \
-    squashfs \
-    lvm2 \
-    tar \
-    gzip \
-    vim \
-    which \
-    less \
-    sudo \
-    curl \
-    iproute2 \
-    podman \
-    sed \
-    btrfsprogs \
-    btrfsmaintenance \
-    snapper \
-    glibc-gconv-modules-extra \
-    wget \
-    unzip \
-    nmap \
-    tcpdump \
-    openvswitch \
-    NetworkManager-ovs \
-    tmux \
-    screen \
-    traceroute \
-    iputils \
-    ipmitool \
-    netcat \
-    bind-utils \
-    jq \
-    yq \
-    bash-completion \
-    frr \
-    patch \
-    wireshark \
-    lldpd \
-    dhcp-client \
-    ovmf
+      bash-completion \
+      bind-utils \
+      btrfsmaintenance \
+      btrfsprogs \
+      curl \
+      device-mapper \
+      dhcp-client \
+      dosfstools \
+      dracut \
+      e2fsprogs \
+      findutils \
+      frr \
+      glibc-gconv-modules-extra \
+      gptfdisk \
+      grub2 \
+      "grub2-${ARCH}-efi" \
+      gzip \
+      haveged \
+      ipmitool \
+      iproute2 \
+      iputils \
+      jq \
+      kernel-default \
+      less \
+      lldpd \
+      lvm2 \
+      mtools \
+      netcat \
+      NetworkManager \
+      NetworkManager-ovs \
+      nmap \
+      openssh-clients \
+      openssh-server \
+      openvswitch \
+      ovmf \
+      parted \
+      patch \
+      podman \
+      rsync \
+      screen \
+      sed \
+      shim \
+      snapper \
+      squashfs \
+      sudo \
+      systemd \
+      tar \
+      tcpdump \
+      timezone \
+      tmux \
+      traceroute \
+      unzip \
+      vim \
+      wget \
+      which \
+      wireshark \
+      xorriso \
+      yq
 
 # elemental-register dependencies
-RUN ARCH=$(uname -m); \
-    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+# hadolint ignore=DL3036,DL3037
+RUN ARCH="$(uname -m)"; \
+    [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-    dmidecode
-# libopenssl-1_1
-
-# Install nm-configurator
-RUN curl -o /usr/sbin/nmc -L https://github.com/suse-edge/nm-configurator/releases/latest/download/nmc-linux-$(uname -m)
-RUN chmod +x /usr/sbin/nmc
+      dmidecode && \
+    # Install nm-configurator
+    curl -o /usr/sbin/nmc -L https://github.com/suse-edge/nm-configurator/releases/latest/download/nmc-linux-"$(uname -m)" && \
+    chmod +x /usr/sbin/nmc
 
 # SELinux policy and tools
-RUN ARCH=$(uname -m); \
-    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+# hadolint ignore=DL3036,DL3037
+RUN ARCH="$(uname -m)"; \
+    [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-    # patterns-base-selinux \
-    # rke2-selinux \
-    audit
+      audit
+      # patterns-base-selinux \
+      # rke2-selinux \
 
 # Add system files
 COPY files/ /
 
-# Enable SELinux (The security=selinux arg is default on Micro, not on Tumbleweed)
-RUN sed -i "s/selinux=1/security=selinux selinux=1/g" /etc/elemental/bootargs.cfg
-# Enforce SELinux
-# RUN sed -i "s/enforcing=0/enforcing=1/g" /etc/elemental/bootargs.cfg
+# Enable SELinux. The security=selinux arg is set by default on Micro, but not on Tumbleweed.
+RUN sed -i "s/selinux=1/security=selinux selinux=1/g" /etc/elemental/bootargs.cfg && \
+    # Enforce SELinux
+    # sed -i "s/enforcing=0/enforcing=1/g" /etc/elemental/bootargs.cfg && \
+    chmod 0600 /etc/NetworkManager/system-connections/fabric.nmconnection
+
 
 # Add elemental-register
 COPY --from=register /usr/sbin/elemental-register /usr/sbin/elemental-register
@@ -174,39 +183,31 @@ ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RAN
 
 # Enable essential services
 RUN systemctl enable \
-    NetworkManager.service \
-    sshd.service \
-    elemental-register.timer \
-    openvswitch.service \
-    frr.service \
-    lldpd.service \
-    wait-for-internet.service
-
-RUN chmod +x /etc/NetworkManager/dispatcher.d/10-fabric.sh
-RUN chmod +x /etc/NetworkManager/dispatcher.d/10-hostname-handler.sh
-RUN chmod 0600 /etc/NetworkManager/system-connections/fabric.nmconnection
-
-# This is for testing purposes, do not do this in production.
-RUN echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf
-
-# Make sure trusted certificates are properly generated
-RUN /usr/sbin/update-ca-certificates
-
-# Ensure /tmp is mounted as tmpfs by default
-RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
-    cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
-    fi
-
-# Save some space
-RUN zypper clean --all && \
+      elemental-register.timer \
+      frr.service \
+      lldpd.service \
+      NetworkManager.service \
+      openvswitch.service \
+      sshd.service \
+      wait-for-internet.service && \
+    # This is for testing purposes, do not do this in production.
+    echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf && \
+    # Make sure trusted certificates are properly generated
+    /usr/sbin/update-ca-certificates && \
+    # Ensure /tmp is mounted as tmpfs by default
+    if [ -e /usr/share/systemd/tmp.mount ]; then \
+      cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
+    fi; \
+    # Save some space
+    zypper clean --all && \
     rm -rf /var/log/update* && \
-    >/var/log/lastlog && \
+    printf '' > /var/log/lastlog && \
     rm -rf /boot/vmlinux*
 
-# Update os-release file with some metadata
+# Update os-release metadata
 ARG IMAGE_REPO=norepo
 ARG IMAGE_TAG=latest
-RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
+RUN echo TIMESTAMP="$(date +'%Y%m%d%H%M%S')" >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"Elemental Wiit\" >> /etc/os-release && \
     echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release && \
@@ -215,4 +216,5 @@ RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
     sed -i -e "s|^PRETTY_NAME=.*|PRETTY_NAME=\"Elemental Wiit ${IMAGE_TAG}\"|g" /etc/os-release
 
 # Rebuild initrd to setup dracut with the boot configurations
+# hadolint ignore=DL3059
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
