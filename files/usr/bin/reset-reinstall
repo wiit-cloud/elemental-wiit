@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 
-ipmitool chassis bootdev remotecd options=efiboot
+if ! ipmitool chassis bootdev remotecd options=efiboot
+then
+  echo "Failed to set boot device to remote CD. Please check your IPMI configuration." >&2
+  exit 1
+fi
+
 ipmitool chassis power reset
