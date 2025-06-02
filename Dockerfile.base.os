@@ -197,7 +197,7 @@ RUN systemctl enable \
     # Ensure /tmp is mounted as tmpfs by default
     if [ -e /usr/share/systemd/tmp.mount ]; then \
       cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
-    fi && \
+    fi; \
     # Save some space
     zypper clean --all && \
     rm -rf /var/log/update* && \
