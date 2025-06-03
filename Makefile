@@ -20,6 +20,7 @@ ELEMENTAL_TAG?=$(SOURCE_VERSION)-$(ELEMENTAL_BUILD)
 .PHONY: build-base-os
 build-base-os:
 	$(DOCKER) build \
+			--no-cache \
 			--build-arg SOURCE_VERSION=$(SOURCE_VERSION) \
 			--build-arg REGISTER_TAG=$(REGISTER_TAG) \
 			--build-arg REGISTER_COMMIT=$(REGISTER_COMMIT) \
