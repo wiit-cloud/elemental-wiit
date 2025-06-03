@@ -1,9 +1,77 @@
 #!/usr/bin/env bash
 
-if ! ipmitool chassis bootdev remotecd options=efiboot
-then
-  echo "Failed to set boot device to remote CD. Please check your IPMI configuration." >&2
-  exit 1
-fi
+echo_info() {
+  echo -ne "\e[1m\e[34mINF\e[0m " >&2
+  echo "$*" >&2
+}
 
-ipmitool chassis power reset
+echo_success() {
+  echo -ne "\e[1m\e[32mOK\e[0m " >&2
+  echo "$*" >&2
+}
+
+echo_warning() {
+  [[ -n "$NO_WARNINGS" ]] && return 0
+  echo -ne "\e[1m\e[33mWRN\e[0m " >&2
+  echo "$*" >&2
+}
+
+echo_error() {
+  echo -ne "\e[1m\e[31mERR\e[0m " >&2
+  echo "$*" >&2
+}
+
+ipmitool() {
+  echo_info "Executing: ipmitool $*" >&2
+  command ipmitool "$@"
+}
+
+set_boot_device() {
+  if ! ipmitool chassis bootdev remotecd options=efiboot
+  then
+    echo_warning "Failed to set boot device to remote CD. Resorting to raw command."
+
+    if ! ipmitool raw 0x00 0x08 0x05 0xA0 0x20 0x00 0x00 0x00
+    then
+      echo_error "Failed to set boot device using raw command."
+      return 1
+    fi
+  fi
+}
+
+verify_boot_device() {
+  local bootparams
+  bootparams=$(ipmitool chassis bootparam get 5)
+
+  if ! grep -q "Force Boot from remotely connected CD/DVD" <<< "$bootparams"
+  then
+    echo_error "Boot device is not set to Remote CD."
+    echo "$bootparams" >&2
+    return 1
+  fi
+
+  if ! grep -q "EFI boot" <<< "$bootparams"
+  then
+    echo_error "Boot mode is not set to EFI."
+    echo "$bootparams" >&2
+    return 1
+  fi
+
+  echo_success "Boot device successfully set to EFI Remote CD."
+  return 0
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+  set_boot_device || exit 1
+  verify_boot_device || exit 1
+
+  if [[ -n "$NO_REBOOT" ]]
+  then
+    echo_info "Skipping reboot."
+    exit 0
+  fi
+
+  echo_info "Power reset!"
+  ipmitool chassis power reset
+fi
