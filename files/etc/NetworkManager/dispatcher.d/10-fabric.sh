@@ -67,10 +67,10 @@ else
     echo "Successfully updated '$FABRIC_CONNECTION' connection"
 
     # Check if the connection is currently active
-    # if nmcli -t -f NAME,STATE connection show --active | grep -q -- "^$FABRIC_CONNECTION:activated"; then
-    #     echo "Reapplying connection to activate new settings"
-    #     nmcli connection up "$FABRIC_CONNECTION"
-    # fi
+    if nmcli -t -f NAME,STATE connection show --active | grep -q -- "^$FABRIC_CONNECTION:activated"; then
+        echo "Reapplying connection to activate new settings"
+        nmcli device reapply "$FABRIC_CONNECTION"
+    fi
 fi
 
 # NOTE Beware of race-conditions here!
