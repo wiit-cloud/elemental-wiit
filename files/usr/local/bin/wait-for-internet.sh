@@ -6,7 +6,7 @@
 TIMEOUT=300  # 5 minutes total timeout
 INTERVAL=5   # Check every 5 seconds
 ELAPSED=0
-TARGET="https://rancher-staging.gec.io/ping"
+TARGET="https://rancher-staging.wiit-edge.services/ping"
 
 echo "Waiting for internet connectivity..."
 
