@@ -143,7 +143,8 @@ RUN ARCH="$(uname -m)"; \
     wireshark \
     xorriso \
     yq \
-    util-linux-systemd=2.40.4-4.2
+    util-linux-systemd=2.40.4-4.2 \
+    util-linux=2.40.4-4.2
 # ☝️ only works for about a month. Tumbleweed package repos are deleted afterwards
 # Keep an eye on https://software.opensuse.org/package/util-linux for 2.41.1
 # Issue caused by https://github.com/util-linux/util-linux/issues/3474
