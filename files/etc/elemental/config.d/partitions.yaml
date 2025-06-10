@@ -1,0 +1,6 @@
+install:
+  partitions:
+    recovery:
+      size: 8192
+    state:
+      size: 16384
