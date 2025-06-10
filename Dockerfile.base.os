@@ -83,72 +83,77 @@ ARG RANCHER_SYSTEM_AGENT_VERSION=v0.3.12
 # hadolint ignore=DL3036,DL3037
 RUN ARCH="$(uname -m)"; \
     [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
+    zypper ar -f https://download.opensuse.org/history/20250602/tumbleweed/repo/oss/ pinned-oss && \
     zypper --non-interactive install --no-recommends -- \
-      bash-completion \
-      bind-utils \
-      btrfsmaintenance \
-      btrfsprogs \
-      curl \
-      device-mapper \
-      dhcp-client \
-      dosfstools \
-      dracut \
-      e2fsprogs \
-      findutils \
-      frr \
-      glibc-gconv-modules-extra \
-      gptfdisk \
-      grub2 \
-      "grub2-${ARCH}-efi" \
-      gzip \
-      haveged \
-      ipmitool \
-      iproute2 \
-      iputils \
-      jq \
-      kernel-default \
-      less \
-      lldpd \
-      lvm2 \
-      mtools \
-      netcat \
-      NetworkManager \
-      NetworkManager-ovs \
-      nmap \
-      openssh-clients \
-      openssh-server \
-      openvswitch \
-      ovmf \
-      parted \
-      patch \
-      podman \
-      rsync \
-      screen \
-      sed \
-      shim \
-      snapper \
-      squashfs \
-      sudo \
-      systemd \
-      tar \
-      tcpdump \
-      timezone \
-      tmux \
-      traceroute \
-      unzip \
-      vim \
-      wget \
-      which \
-      wireshark \
-      xorriso \
-      yq
+    bash-completion \
+    bind-utils \
+    btrfsmaintenance \
+    btrfsprogs \
+    curl \
+    device-mapper \
+    dhcp-client \
+    dosfstools \
+    dracut \
+    e2fsprogs \
+    findutils \
+    frr \
+    glibc-gconv-modules-extra \
+    gptfdisk \
+    grub2 \
+    "grub2-${ARCH}-efi" \
+    gzip \
+    haveged \
+    ipmitool \
+    iproute2 \
+    iputils \
+    jq \
+    kernel-default \
+    less \
+    lldpd \
+    lvm2 \
+    mtools \
+    netcat \
+    NetworkManager \
+    NetworkManager-ovs \
+    nmap \
+    openssh-clients \
+    openssh-server \
+    openvswitch \
+    ovmf \
+    parted \
+    patch \
+    podman \
+    rsync \
+    screen \
+    sed \
+    shim \
+    snapper \
+    squashfs \
+    sudo \
+    systemd \
+    tar \
+    tcpdump \
+    timezone \
+    tmux \
+    traceroute \
+    unzip \
+    vim \
+    wget \
+    which \
+    wireshark \
+    xorriso \
+    yq \
+    util-linux-systemd=2.40.4-4.2
+# ☝️ only works for about a month. Tumbleweed package repos are deleted afterwards
+# Keep an eye on https://software.opensuse.org/package/util-linux for 2.41.1
+# Issue caused by https://github.com/util-linux/util-linux/issues/3474
 
 # elemental-register dependencies
 # hadolint ignore=DL3036,DL3037
 RUN ARCH="$(uname -m)"; \
     [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-      dmidecode && \
+    dmidecode && \
     # Install nm-configurator
     curl -o /usr/sbin/nmc -L https://github.com/suse-edge/nm-configurator/releases/latest/download/nmc-linux-"$(uname -m)" && \
     chmod +x /usr/sbin/nmc
@@ -158,9 +163,9 @@ RUN ARCH="$(uname -m)"; \
 RUN ARCH="$(uname -m)"; \
     [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-      audit
-      # patterns-base-selinux \
-      # rke2-selinux \
+    audit
+# patterns-base-selinux \
+# rke2-selinux \
 
 # Add system files
 COPY files/ /
@@ -183,20 +188,20 @@ ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RAN
 
 # Enable essential services
 RUN systemctl enable \
-      elemental-register.timer \
-      lldpd.service \
-      NetworkManager.service \
-      openvswitch.service \
-      sshd.service \
-      wait-for-internet.service \
-      frr-ready.path && \
+    elemental-register.timer \
+    lldpd.service \
+    NetworkManager.service \
+    openvswitch.service \
+    sshd.service \
+    wait-for-internet.service \
+    frr-ready.path && \
     # This is for testing purposes, do not do this in production.
     echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf && \
     # Make sure trusted certificates are properly generated
     /usr/sbin/update-ca-certificates && \
     # Ensure /tmp is mounted as tmpfs by default
     if [ -e /usr/share/systemd/tmp.mount ]; then \
-      cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
+    cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
     fi; \
     # Save some space
     zypper clean --all && \
