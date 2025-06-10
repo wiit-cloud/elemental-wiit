@@ -33,6 +33,7 @@ stages:
             persistent:
               mode: bind
               paths:
+              - /etc/origin
               - /etc/systemd
               - /etc/rancher
               - /etc/ssh
