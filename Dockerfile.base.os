@@ -84,7 +84,7 @@ ARG RANCHER_SYSTEM_AGENT_VERSION=v0.3.12
 RUN ARCH="$(uname -m)"; \
     [ "${ARCH}" = "aarch64" ] && ARCH="arm64"; \
     zypper ar -f https://download.opensuse.org/history/20250602/tumbleweed/repo/oss/ pinned-oss && \
-    zypper --non-interactive install --no-recommends -- \
+    zypper --non-interactive install --no-recommends --oldpackage -- \
     bash-completion \
     bind-utils \
     btrfsmaintenance \
