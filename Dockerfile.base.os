@@ -19,7 +19,6 @@ ARG REGISTER_COMMITDATE=2025-04-23
 ADD https://github.com/rancher/elemental-operator.git#${REGISTER_TAG} .
 
 ENV CGO_ENABLED=1
-RUN go generate ./...
 RUN go build  \
     -ldflags "-w -s  \
     -X github.com/rancher/elemental-operator/pkg/version.Version=${REGISTER_TAG}  \
@@ -39,6 +38,8 @@ WORKDIR /src/
 
 ARG TOOLKIT_TAG=v2.2.2
 ARG TOOLKIT_COMMIT=1fbc11e
+
+RUN apk add --no-cache tar
 
 ADD https://github.com/rancher/elemental-toolkit.git#${TOOLKIT_TAG} .
 
