@@ -112,7 +112,7 @@ RUN ARCH="$(uname -m)"; \
     lldpd \
     lvm2 \
     mtools \
-    netcat \
+    netcat-openbsd \
     NetworkManager \
     NetworkManager-ovs \
     nmap \
