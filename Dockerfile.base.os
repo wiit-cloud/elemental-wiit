@@ -19,6 +19,7 @@ ARG REGISTER_COMMITDATE=2025-04-23
 ADD https://github.com/rancher/elemental-operator.git#${REGISTER_TAG} .
 
 ENV CGO_ENABLED=1
+RUN go generate ./...
 RUN go build  \
     -ldflags "-w -s  \
     -X github.com/rancher/elemental-operator/pkg/version.Version=${REGISTER_TAG}  \
