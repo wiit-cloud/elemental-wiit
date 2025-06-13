@@ -1,29 +1,5 @@
 # syntax=docker/dockerfile:1.15.1-labs
 
-FROM golang:1.24.3-bookworm AS builder
-
-ARG TAG=v1.6.8
-ARG COMMIT="d8008d7"
-ARG COMMITDATE="2025-04-23"
-
-ADD https://github.com/rancher/elemental-operator@$TAG .
-
-ENV CGO_ENABLED=1
-RUN go build  \
-    -ldflags "-w -s  \
-    -X github.com/rancher/elemental-operator/pkg/version.Version=$TAG  \
-    -X github.com/rancher/elemental-operator/pkg/version.Commit=$COMMIT  \
-    -X github.com/rancher/elemental-operator/pkg/version.CommitDate=$COMMITDATE"  \
-    -o /usr/sbin/elemental-register ./cmd/register
-ENV CGO_ENABLED=0
-RUN go build  \
-    -ldflags "-w -s  \
-    -X github.com/rancher/elemental-operator/pkg/version.Version=$TAG  \
-    -X github.com/rancher/elemental-operator/pkg/version.Commit=$COMMIT  \
-    -X github.com/rancher/elemental-operator/pkg/version.CommitDate=$COMMITDATE"  \
-    -o /usr/sbin/elemental-support ./cmd/support
-
-
 ARG ELEMENTAL_TOOLKIT
 ARG SOURCE_REPO
 ARG SOURCE_VERSION
