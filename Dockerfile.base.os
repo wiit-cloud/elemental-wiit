@@ -92,11 +92,9 @@ RUN ARCH="$(uname -m)"; \
     mtools \
     netcat-openbsd \
     NetworkManager \
-    NetworkManager-ovs \
     nmap \
     openssh-clients \
     openssh-server \
-    openvswitch \
     ovmf \
     parted \
     patch \
@@ -120,13 +118,7 @@ RUN ARCH="$(uname -m)"; \
     which \
     wireshark \
     xorriso \
-    yq \
-    util-linux-systemd=2.40.4-4.2 \
-    util-linux=2.40.4-4.2 \
-    libmount1=2.40.4-4.2
-# ☝️ only works for about a month. Tumbleweed package repos are deleted afterwards
-# Keep an eye on https://software.opensuse.org/package/util-linux for 2.41.1
-# Issue caused by https://github.com/util-linux/util-linux/issues/3474
+    yq 
 
 # elemental-register dependencies
 # hadolint ignore=DL3036,DL3037
@@ -171,7 +163,6 @@ RUN systemctl enable \
     elemental-register.timer \
     lldpd.service \
     NetworkManager.service \
-    openvswitch.service \
     sshd.service \
     wait-for-internet.service \
     frr-ready.path && \
