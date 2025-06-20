@@ -13,6 +13,7 @@ INTERFACE="$1"
 ACTION="$2"
 FABRIC_CONNECTION="fabric"
 VARS_FILE=/etc/wiit-env.vars
+HOSTS_FILE=/etc/hosts
 
 # Exit if the action was triggered by the fabric interface
 if [ "$INTERFACE" == "$FABRIC_CONNECTION" ]; then
@@ -75,6 +76,38 @@ fi
 
 # NOTE Beware of race-conditions here!
 # We might need to add a lock on the vars file to prevent concurrent writes
+
+# Let's fix that fqdn stuff here as well
+if [ -n "$DHCP4_HOST_NAME"] || [ -n "$DHCP4_DOMAIN_NAME" ]; then
+    echo "Can't update hosts file, information is missing"
+else
+    # Check if /etc/hosts exists
+    if [ ! -f "$HOSTS_FILE" ]; then
+        echo "$HOSTS_FILE does not exist" >&2
+        exit 1
+    fi
+
+    # Backup original hosts file
+    if ! cp $HOSTS_FILE $HOSTS_FILE.bak; then
+        echo "Could not create backup of $HOSTS_FILE"
+        exit 1
+    fi
+
+    # Update hosts file, by simply replacing the full line for localhost
+    if ! sed -i -E "s|^(127\.0\.0\.1)\s+.*$|\1\t$DHCP4_HOST_NAME.$DHCP4_DOMAIN_NAME $DHCP4_HOST_NAME localhost localhost.localdomain|g" "$HOSTS_FILE"; then
+        echo "Failed to update $HOSTS_FILE" >&2
+        exit 1
+    fi
+
+    if ! sed -i -E "s|^(::1)\s+.*$|\1\t$DHCP4_HOST_NAME.$DHCP4_DOMAIN_NAME $DHCP4_HOST_NAME localhost localhost.localdomain ipv6-localhost ipv6-loopback|g" "$HOSTS_FILE"; then
+        echo "Failed to update $HOSTS_FILE" >&2
+        exit 1
+    fi
+
+fi
+
+
+
 
 # Update fabric IP
 VARS_FILE_CONTENT=$(sed -r -e "s|^FABRIC_IP=.*|FABRIC_IP=${DHCP4_WIIT_VENDOR_FABRIC_IP}|g" "$VARS_FILE")

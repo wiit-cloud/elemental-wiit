@@ -39,6 +39,7 @@ WORKDIR /src/
 ARG TOOLKIT_TAG=v2.2.2
 ARG TOOLKIT_COMMIT=1fbc11e
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache tar
 
 ADD https://github.com/rancher/elemental-toolkit.git#${TOOLKIT_TAG} .

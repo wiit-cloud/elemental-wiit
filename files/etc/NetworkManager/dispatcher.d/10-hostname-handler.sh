@@ -9,6 +9,8 @@
 
 set -x
 
+return 0
+
 INTERFACE="$1"
 ACTION="$2"
 HOSTS_FILE="/etc/hosts"
