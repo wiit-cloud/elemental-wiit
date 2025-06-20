@@ -9,7 +9,7 @@
 
 set -x
 
-return 0
+exit 0
 
 INTERFACE="$1"
 ACTION="$2"
