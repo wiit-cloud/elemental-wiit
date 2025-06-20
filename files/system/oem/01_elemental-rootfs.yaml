@@ -1,9 +1,9 @@
 name: "Elemental Rootfs Layout Settings"
 stages:
   initramfs:
-    - if: '[ ! -f /run/elemental/recovery_mode ]'
-      commands:
-        - ln -sf /run/elemental/persistent/etc/hostname /etc/hostname
+    # - if: '[ ! -f /run/elemental/recovery_mode ]'
+    #   commands:
+    #     - ln -sf /run/elemental/persistent/etc/hostname /etc/hostname
     - if: '[ ! -f "/run/elemental/recovery_mode" ]'
       name: "Persist /etc/machine-id"
       commands:
