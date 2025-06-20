@@ -25,6 +25,10 @@ echo "Called with action=$ACTION"
 NEW_HOSTNAME=$(hostname 2>/dev/null || echo "")
 NEW_FQDN=$(hostname -f 2>/dev/null || echo "")
 
+echo "Currently known: hostname $NEW_HOSTNAME and fqdn $NEW_FQDN"
+echo mlx0: $(nmcli -f DHCP4.OPTIONS device show mlx0 | egrep "\s(host_name|domain_name)\s")
+echo mlx1: $(nmcli -f DHCP4.OPTIONS device show mlx1 | egrep "\s(host_name|domain_name)\s")
+
 # Check if /etc/hosts exists
 if [ ! -f "$HOSTS_FILE" ]; then
     echo "$HOSTS_FILE does not exist" >&2
