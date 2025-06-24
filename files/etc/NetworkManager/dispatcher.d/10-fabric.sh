@@ -78,7 +78,7 @@ fi
 # We might need to add a lock on the vars file to prevent concurrent writes
 
 # Let's fix that fqdn stuff here as well
-if [ -n "$DHCP4_HOST_NAME"] || [ -n "$DHCP4_DOMAIN_NAME" ]; then
+if [ -n "$DHCP4_HOST_NAME" ] || [ -n "$DHCP4_DOMAIN_NAME" ]; then
     echo "Can't update hosts file, information is missing"
 else
     # Check if /etc/hosts exists
