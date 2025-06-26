@@ -85,6 +85,7 @@ RUN ARCH="$(uname -m)"; \
     ipmitool \
     iproute2 \
     iputils \
+    iptables \
     jq \
     kernel-default \
     less \
