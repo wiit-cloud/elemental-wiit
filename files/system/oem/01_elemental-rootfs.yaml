@@ -51,6 +51,7 @@ stages:
               - /var/lib/NetworkManager
               - /var/lib/cni
               - /var/lib/calico
+              - /var/lib/nova
               - /var/lib/rook
     - if: '[ -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration for recovery"
