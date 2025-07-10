@@ -12,9 +12,9 @@ RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt update
 # hadolint ignore=DL3027,DL3059
 RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive apt install -y libssl-dev
 
-ARG REGISTER_TAG=v1.6.8
-ARG REGISTER_COMMIT=d8008d7
-ARG REGISTER_COMMITDATE=2025-04-23
+ARG REGISTER_TAG=v1.7.3
+ARG REGISTER_COMMIT=1ab38de
+ARG REGISTER_COMMITDATE=2025-06-17
 
 ADD https://github.com/rancher/elemental-operator.git#${REGISTER_TAG} .
 
